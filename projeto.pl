@@ -11,24 +11,15 @@
 :- [codigo_comum, puzzles_publicos].
 
 % ------------------------------------------------------------------------------
-% formata_ilhas(Ilha, Ilha_formatada)
-% ------------------------------------------------------------------------------
-
-formata_ilhas(
-  ((N_lin, N_col), Ponte),
-  ilha(Ponte, (N_lin, N_col))
-).
-
-% ------------------------------------------------------------------------------
 % extrai_ilhas_linha(N_lin, Lin, Ilhas)
 % ------------------------------------------------------------------------------
 
 extrai_ilhas_linha(N_lin, Lin, Ilhas) :-
   setof(
-    ((N_lin, N_col), El), (member(El, Lin), El \== 0,
-    nth1(N_col, Lin, El)), Ilhas_aux
+    ilha(Ponte, (N_lin, N_col)), (member(Ponte, Lin), Ponte \== 0,
+    nth1(N_col, Lin, Ponte)), Ilhas_aux
   ),
-  maplist(formata_ilhas, Ilhas_aux, Ilhas).
+  sort(2, @=<, Ilhas_aux, Ilhas).
 
 % ------------------------------------------------------------------------------
 % ilhas(Puz, Ilhas)
@@ -40,3 +31,24 @@ ilhas(Puz, Ilhas) :-
     extrai_ilhas_linha(N_lin, Lin, Ilha)), Ilhas_aux
   ),
   flatten(Ilhas_aux, Ilhas).
+
+% ------------------------------------------------------------------------------
+% vizinhas(Ilhas, Ilha, Vizinhas)
+% ------------------------------------------------------------------------------
+
+vizinhas(Ilhas, Ilha, Viz) :-
+  ilha(_, (N_l, N_c)) = Ilha,
+  findall(
+    Ilha_viz, (member(Ilha_viz, Ilhas), Ilha_viz = ilha(_, (N_L, N_C)),
+    (N_L == N_l ; N_C == N_c), (N_L, N_C) \== (N_l, N_c)), Viz
+  ).
+
+% ------------------------------------------------------------------------------
+% estado(Ilhas, Estado)
+% ------------------------------------------------------------------------------
+
+estado(Ilhas, Estado) :-
+  findall(
+    [X, Y, []], (member(X, Ilhas), vizinhas(Ilhas, X, Y)),
+    Estado
+  ).
