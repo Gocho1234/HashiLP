@@ -39,9 +39,15 @@ ilhas(Puz, Ilhas) :-
 vizinhas(Ilhas, Ilha, Viz) :-
   ilha(_, (N_l, N_c)) = Ilha,
   findall(
-    Ilha_viz, (member(Ilha_viz, Ilhas), Ilha_viz = ilha(_, (N_L, N_C)),
-    (N_L == N_l ; N_C == N_c), (N_L, N_C) \== (N_l, N_c)), Viz
-  ).
+    Ilha_viz, (member(Ilha_viz, Ilhas), Ilha_viz = ilha(_, (N_L, _)),
+    N_L == N_l), Lin_aux
+  ),
+  findall(
+    Ilha_viz, (member(Ilha_viz, Ilhas), Ilha_viz = ilha(_, (_, N_C)),
+    N_C == N_c), Col_aux
+  ),
+  append(Lin, Col, Viz_aux),
+  sort(2, @=<, Viz_aux, Viz).
 
 % ------------------------------------------------------------------------------
 % estado(Ilhas, Estado)
