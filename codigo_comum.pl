@@ -34,7 +34,7 @@ escreve_linha(L) :-
 
 escreve_final(Puz) :-
     maplist(escreve_linha, Puz).
-    
+
 tira_repetidas(Lst_lst_pontes, Lst_pontes) :-
     tira_repetidas(Lst_lst_pontes, Lst_pontes, []).
 
