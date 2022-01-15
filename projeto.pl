@@ -96,3 +96,25 @@ posicoes_entre(Pos1, Pos2, Posicoes) :-
 cria_ponte(Pos1, Pos2, Ponte) :-
   sort([Pos1, Pos2], [Pos1_novo, Pos2_novo]),
   Ponte = ponte(Pos1_novo, Pos2_novo).
+
+% ------------------------------------------------------------------------------
+% caminho_livre(Pos1, Pos2, Posicoes, I, Vz)
+% ------------------------------------------------------------------------------
+
+caminho_livre(_, _, Posicoes, ilha(_, PosI), ilha(_, PosVz)) :-
+  posicoes_entre(PosI, PosVz, PosEntre),
+  findall(
+    Pos, (member(Pos, PosEntre), subset([Pos], Posicoes)),
+    Posicoes_comum
+  ), length(Posicoes_comum, Len), Len \== 1.
+
+% ------------------------------------------------------------------------------
+% actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, Entrada, Nova_Entrada)
+% ------------------------------------------------------------------------------
+
+actualiza_vizinhas_entrada(_, _, Posicoes, [I, Vz, []], [I, Vz_novo, []]) :-
+  findall(
+    Pos, (member(Pos, Vz),
+    caminho_livre(_, _, Posicoes, I, Pos)),
+    Vz_novo
+  ).

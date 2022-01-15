@@ -110,9 +110,9 @@
 % Predicado caminho_livre (P7)
 % Cotacao total: 1 (0.5)
 % Cotacao parcial: 0
-%:- caminho_livre((4,1), (4,5), [(4, 2), (4, 3), (4, 4)], ilha(_, (1,3)), ilha(_, (3,3))), writeln(true); writeln(false).
+:- nl, caminho_livre((4,1), (4,5), [(4, 2), (4, 3), (4, 4)], ilha(_, (1,3)), ilha(_, (3,3))), writeln(true); writeln(false).
 % output: true
-%:- caminho_livre((4,1), (4,5), [(4, 2), (4, 3), (4, 4)], ilha(_, (1,3)), ilha(_, (5,3))), writeln(false); writeln(true).
+:- caminho_livre((4,1), (4,5), [(4, 2), (4, 3), (4, 4)], ilha(_, (1,3)), ilha(_, (5,3))), writeln(false); writeln(true).
 % output: true
 
 % Teste 19 - Publico
@@ -120,9 +120,9 @@
 % Cotacao total: 1 (0.5)
 % Cotacao parcial: 0
 
-%:- caminho_livre((4,1), (4,5), [(4, 2), (4, 3), (4, 4)], ilha(_, (1,3)), ilha(_, (5,3))), writeln(false); writeln(true).
+:- caminho_livre((4,1), (4,5), [(4, 2), (4, 3), (4, 4)], ilha(_, (1,3)), ilha(_, (5,3))), writeln(false); writeln(true).
 % output: true
-%:- caminho_livre((4,1), (4,5), [(4, 2), (4, 3), (4, 4)], ilha(_, (5,3)), ilha(_, (7,3))), writeln(true); writeln(false72).
+:- caminho_livre((4,1), (4,5), [(4, 2), (4, 3), (4, 4)], ilha(_, (5,3)), ilha(_, (7,3))), writeln(true); writeln(false72).
 % output: true
 
 %--------------------------------
@@ -134,9 +134,9 @@
 % Cotacao total: 1 (0.5)
 % Cotacao parcial: 0
 
-%:- actualiza_vizinhas_entrada((4,1), (4,5), [(4, 2), (4, 3), (4, 4)], [ilha(2, (1,3)), [ilha(2, (3,3))], []], NovaEntrada), writeln(NovaEntrada); writeln(false).
+:- nl, actualiza_vizinhas_entrada((4,1), (4,5), [(4, 2), (4, 3), (4, 4)], [ilha(2, (1,3)), [ilha(2, (3,3))], []], NovaEntrada), writeln(NovaEntrada); writeln(false).
 % output: [ilha(2,(1,3)),[ilha(2,(3,3))],[]]
-%:- actualiza_vizinhas_entrada((4,1), (4,5), [(4, 2), (4, 3), (4, 4)], [ilha(2, (1,3)), [ilha(2, (5,3))], []], NovaEntrada), writeln(NovaEntrada); writeln(false).
+:- actualiza_vizinhas_entrada((4,1), (4,5), [(4, 2), (4, 3), (4, 4)], [ilha(2, (1,3)), [ilha(2, (5,3))], []], NovaEntrada), writeln(NovaEntrada); writeln(false).
 % output: [ilha(2,(1,3)),[],[]]
 
 % Teste 23 - Publico
@@ -144,9 +144,9 @@
 % Cotacao total: 1 (0.5)
 % Cotacao parcial: 0
 
-%:- actualiza_vizinhas_entrada((1, 4), (5, 4), [(2, 4), (3, 4), (4, 4)], [ilha(2, (3,1)), [ilha(2, (3,5))], []], NovaEntrada), writeln(NovaEntrada); writeln(false).
+:- actualiza_vizinhas_entrada((1, 4), (5, 4), [(2, 4), (3, 4), (4, 4)], [ilha(2, (3,1)), [ilha(2, (3,5))], []], NovaEntrada), writeln(NovaEntrada); writeln(false).
 % output: [ilha(2,(3,1)),[],[]]
-%:- actualiza_vizinhas_entrada((1, 4), (5, 4), [(2, 4), (3, 4), (4, 4)], [ilha(2, (3,5)), [ilha(2, (3,7))], []], NovaEntrada), writeln(NovaEntrada); writeln(false).
+:- actualiza_vizinhas_entrada((1, 4), (5, 4), [(2, 4), (3, 4), (4, 4)], [ilha(2, (3,5)), [ilha(2, (3,7))], []], NovaEntrada), writeln(NovaEntrada); writeln(false).
 % output: [ilha(2,(3,5)),[ilha(2,(3,7))],[]]
 
 %--------------------------------
