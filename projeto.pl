@@ -15,11 +15,11 @@
 % ------------------------------------------------------------------------------
 
 extrai_ilhas_linha(N_lin, Lin, Ilhas) :-
-  setof(
+  findall(
     ilha(N_Pontes, (N_lin, N_col)), (nth1(N_col, Lin, N_Pontes),
     N_Pontes \== 0), Ilhas_aux
   ),
-  sort(2, @=<, Ilhas_aux, Ilhas); Ilhas = [].
+  sort(2, @<, Ilhas_aux, Ilhas).
 
 % ------------------------------------------------------------------------------
 % ilhas(Puz, Ilhas)
@@ -81,11 +81,11 @@ entre(Pos1, Pos2, Posicoes) :-
 % posicoes_entre(Pos1, Pos2, Posicoes)
 % ------------------------------------------------------------------------------
 
-posicoes_entre(Pos1, Pos2, Posicoes) :-
+posicoes_entre((Pos1_X, Pos1_Y), (Pos2_X, Pos2_Y), Posicoes) :-
   findall(
-    Pos, (Pos1 = (Pos1_X, Pos1_Y), Pos2 = (Pos2_X, Pos2_Y),
-    (Pos1_X == Pos2_X, entre(Pos1_Y, Pos2_Y, N), Pos = (Pos1_X, N) ;
-    Pos1_Y == Pos2_Y, entre(Pos1_X, Pos2_X, N), Pos = (N, Pos2_Y))),
+    Pos, (
+    Pos1_X == Pos2_X, entre(Pos1_Y, Pos2_Y, N), Pos = (Pos1_X, N) ;
+    Pos1_Y == Pos2_Y, entre(Pos1_X, Pos2_X, N), Pos = (N, Pos2_Y)),
     Posicoes
   ), Posicoes \== [].
 
@@ -93,9 +93,8 @@ posicoes_entre(Pos1, Pos2, Posicoes) :-
 % cria_ponte(Pos1, Pos2, Ponte)
 % ------------------------------------------------------------------------------
 
-cria_ponte(Pos1, Pos2, Ponte) :-
-  sort([Pos1, Pos2], [Pos1_novo, Pos2_novo]),
-  Ponte = ponte(Pos1_novo, Pos2_novo).
+cria_ponte(Pos1, Pos2, ponte(Pos1_novo, Pos2_novo)) :-
+  sort([Pos1, Pos2], [Pos1_novo, Pos2_novo]).
 
 % ------------------------------------------------------------------------------
 % caminho_livre(Pos1, Pos2, Posicoes, I, Vz)
@@ -114,12 +113,12 @@ caminho_livre(Pos1, Pos2, Posicoes, ilha(_, PosI), ilha(_, PosVz)) :-
 % ------------------------------------------------------------------------------
 
 actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, [I, Vz, Pontes], [I, Vz_novo, Pontes]) :-
-  setof(
+  findall(
     Pos, (member(Pos, Vz),
     caminho_livre(Pos1, Pos2, Posicoes, I, Pos)),
     Vz_aux
   ),
-  sort(2, @=<, Vz_aux, Vz_novo), !; Vz_novo = [].
+  sort(2, @<, Vz_aux, Vz_novo), !; Vz_novo = [].
 
 % ------------------------------------------------------------------------------
 % actualiza_vizinhas_apos_pontes(Estado, Pos1, Pos2, Novo_estado)
@@ -127,10 +126,9 @@ actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, [I, Vz, Pontes], [I, Vz_novo, P
 
 actualiza_vizinhas_apos_pontes(Estado, Pos1, Pos2, Novo_estado) :-
   posicoes_entre(Pos1, Pos2, Posicoes),
-  findall(
-    Nova_Entrada, (member(Entrada, Estado),
-    actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, Entrada, Nova_Entrada)),
-    Novo_estado
+  maplist(
+    actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes),
+    Estado, Novo_estado
   ).
 
 % ------------------------------------------------------------------------------
@@ -190,17 +188,18 @@ trata_ilhas_terminadas(Estado, Novo_estado) :-
 
 % ------------------------------------------------------------------------------
 % adiciona_pontes(Num_pontes, Ilha1, Ilha2, Entrada, Nova_Entrada)
+% Predicado auxiliar
 % ------------------------------------------------------------------------------
 
 adiciona_pontes(Num_pontes, Ilha1, Ilha2, Entrada, Nova_Entrada) :-
   Ilha1 = ilha(_, Pos1), Ilha2 = ilha(_, Pos2),
-  Entrada = [Ilha, Vzs, _],
+  Entrada = [Ilha, Vzs, Pontes_antigas],
   cria_ponte(Pos1, Pos2, Ponte_aux),
   (Num_pontes == 1, Ponte = [Ponte_aux] ;
   Num_pontes == 2, append([Ponte_aux], [Ponte_aux], Ponte)),
-  (Ilha == Ilha1, append([], Ponte, Pontes) ;
-  Ilha == Ilha2, append([], Ponte, Pontes) ;
-  Pontes = []),
+  (Ilha == Ilha1, append(Pontes_antigas, Ponte, Pontes) ;
+  Ilha == Ilha2, append(Pontes_antigas, Ponte, Pontes) ;
+  Pontes = Pontes_antigas),
   Nova_Entrada = [Ilha, Vzs, Pontes].
 
 % ------------------------------------------------------------------------------
