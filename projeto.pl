@@ -37,7 +37,7 @@ ilhas(Puz, Ilhas) :-
 % ------------------------------------------------------------------------------
 
 adjacente(Adj, El0, El1) :-
-  append(_, [El0,El1|_], Adj);
+  append(_, [El0,El1|_], Adj) ;
   append(_, [El1,El0|_], Adj).
 
 % ------------------------------------------------------------------------------
@@ -48,11 +48,11 @@ vizinhas(Ilhas, Ilha, Vz) :-
   ilha(_, (N_l, N_c)) = Ilha,
   findall(
     Ilha_viz, (member(Ilha_viz, Ilhas),
-    Ilha_viz = ilha(_, (N_L, _)), N_L == N_l), Lin_aux
+    Ilha_viz = ilha(_, (N_l, _))), Lin_aux
   ), include(adjacente(Lin_aux, Ilha), Lin_aux, Lin),
   findall(
     Ilha_viz, (member(Ilha_viz, Ilhas),
-    Ilha_viz = ilha(_, (_, N_C)), N_C == N_c), Col_aux
+    Ilha_viz = ilha(_, (_, N_c))), Col_aux
   ), include(adjacente(Col_aux, Ilha), Col_aux, Col),
   append(Lin, Col, Vz_aux),
   sort(2, @=<, Vz_aux, Vz).
@@ -83,8 +83,8 @@ entre(Pos1, Pos2, Posicoes) :-
 
 posicoes_entre((Pos1_X, Pos1_Y), (Pos2_X, Pos2_Y), Posicoes) :-
   findall(
-    Pos, (
-    Pos1_X == Pos2_X, entre(Pos1_Y, Pos2_Y, N), Pos = (Pos1_X, N) ;
+    Pos,
+    (Pos1_X == Pos2_X, entre(Pos1_Y, Pos2_Y, N), Pos = (Pos1_X, N) ;
     Pos1_Y == Pos2_Y, entre(Pos1_X, Pos2_X, N), Pos = (N, Pos2_Y)),
     Posicoes
   ), Posicoes \== [].
@@ -118,7 +118,7 @@ actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, [I, Vz, Pontes], [I, Vz_novo, P
     caminho_livre(Pos1, Pos2, Posicoes, I, Pos)),
     Vz_aux
   ),
-  sort(2, @<, Vz_aux, Vz_novo), !; Vz_novo = [].
+  sort(2, @<, Vz_aux, Vz_novo), ! ; Vz_novo = [].
 
 % ------------------------------------------------------------------------------
 % actualiza_vizinhas_apos_pontes(Estado, Pos1, Pos2, Novo_estado)
