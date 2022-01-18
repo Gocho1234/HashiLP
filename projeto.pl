@@ -12,17 +12,22 @@
 
 % ------------------------------------------------------------------------------
 % extrai_ilhas_linha(N_lin, Lin, Ilhas)
+% extrai_ilhas_linha/3: Retira as respetivas ilhas (todas as entradas com
+% valor diferente de 0) de uma dada linha, e apresenta-as de forma organizada
+% da esquerda para a direita.
 % ------------------------------------------------------------------------------
 
 extrai_ilhas_linha(N_lin, Lin, Ilhas) :-
   findall(
     ilha(N_Pontes, (N_lin, N_col)), (nth1(N_col, Lin, N_Pontes),
-    N_Pontes \== 0), Ilhas_aux
-  ),
-  sort(2, @<, Ilhas_aux, Ilhas).
+    N_Pontes \== 0), Ilhas
+  ).
 
 % ------------------------------------------------------------------------------
 % ilhas(Puz, Ilhas)
+% ilhas/2: Percorre cada linha de um puzzle e usa o predicado
+% extrai_ilhas_linha/3 para retirar todas as ilhas. No fim, apresenta-as de
+% forma organizada da esquerda para a direita e de cima para baixo.
 % ------------------------------------------------------------------------------
 
 ilhas(Puz, Ilhas) :-
@@ -34,6 +39,7 @@ ilhas(Puz, Ilhas) :-
 % ------------------------------------------------------------------------------
 % adjacente(Adj, El0, El1)
 % Predicado auxiliar
+% adjacente/3: Verifica se numa dada lista dois elementos sao adjacentes.
 % ------------------------------------------------------------------------------
 
 adjacente(Adj, El0, El1) :-
