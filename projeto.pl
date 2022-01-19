@@ -10,7 +10,7 @@
 %                                                                      %
 % -------------------------------------------------------------------- %
 
-% ------------------------------------------------------------------------------
+% ------------------------------------ 2.1 -------------------------------------
 % extrai_ilhas_linha(N_lin, Lin, Ilhas)
 % extrai_ilhas_linha/3: Retira as respetivas ilhas (todas as entradas com
 % valor diferente de 0) de uma dada linha, e apresenta-as de forma organizada
@@ -23,7 +23,7 @@ extrai_ilhas_linha(N_lin, Lin, Ilhas) :-
     N_Pontes \== 0), Ilhas
   ).
 
-% ------------------------------------------------------------------------------
+% ------------------------------------ 2.2 -------------------------------------
 % ilhas(Puz, Ilhas)
 % ilhas/2: Percorre cada linha de um puzzle e usa o predicado
 % extrai_ilhas_linha/3 para retirar todas as ilhas. No fim, apresenta-as de
@@ -36,18 +36,22 @@ ilhas(Puz, Ilhas) :-
     member(Ilha, Ilhas_aux)), Ilhas
   ).
 
-% ------------------------------------------------------------------------------
+% ------------------------------------ Auxiliar --------------------------------
 % adjacente(Adj, El0, El1)
-% Predicado auxiliar
 % adjacente/3: Verifica se numa dada lista dois elementos sao adjacentes.
 % ------------------------------------------------------------------------------
 
-adjacente(Adj, El0, El1) :-
-  append(_, [El0,El1|_], Adj) ;
-  append(_, [El1,El0|_], Adj).
+adjacente(Lista, El0, El1) :-
+  append(_, [El0,El1|_], Lista) ;
+  append(_, [El1,El0|_], Lista).
 
-% ------------------------------------------------------------------------------
+% ------------------------------------ 2.3 -------------------------------------
 % vizinhas(Ilhas, Ilha, Vz)
+% vizinhas/3: A um dado conjunto de ilhas extrai aquelas que sao vizinhas da
+% ilha fornecida. Obtem inicialmente todas as ilhas que estao na mesma coluna ou
+% linha que a ilha dada e depois vai buscar as ilhas que teem um caminho livre
+% entre elas e a ilha fornecida, utilizando um predicado auxiliar adjacente/3
+% para esse efeito.
 % ------------------------------------------------------------------------------
 
 vizinhas(Ilhas, Ilha, Vz) :-
@@ -63,8 +67,12 @@ vizinhas(Ilhas, Ilha, Vz) :-
   append(Lin, Col, Vz_aux),
   sort(2, @=<, Vz_aux, Vz).
 
-% ------------------------------------------------------------------------------
+% ------------------------------------ 2.4 -------------------------------------
 % estado(Ilhas, Estado)
+% estado/2: Obtem o estado de todas as ilhas de um dado puzzle, ou seja, vai
+% buscar todas as ilhas adjacentes a essa ilha e guarda-as junto da ilha
+% fornecida numa entrada. Por fim, o terceiro elemento da entrada inicia sempre
+% com uma lista vazia.
 % ------------------------------------------------------------------------------
 
 estado(Ilhas, Estado) :-
@@ -73,9 +81,10 @@ estado(Ilhas, Estado) :-
     Estado
   ).
 
-% ------------------------------------------------------------------------------
+% ------------------------------------ Auxiliar --------------------------------
 % entre(Pos1, Pos2, Posicoes)
-% Predicado auxiliar
+% entre/3: Um predicado semelhante ao between, mas que ignora a monotonia dos
+% valores nos primeiros dois argumentos e nao os inclui no resultado final.
 % ------------------------------------------------------------------------------
 
 entre(Pos1, Pos2, Posicoes) :-
