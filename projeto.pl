@@ -36,8 +36,8 @@ ilhas(Puz, Ilhas) :-
     member(Ilha, Ilhas_aux)), Ilhas
   ).
 
-% ------------------------------------ Auxiliar --------------------------------
-% adjacente(Adj, El0, El1)
+% ---------------------------------- Auxiliar ----------------------------------
+% adjacente(Lista, El0, El1)
 % adjacente/3: Verifica se numa dada lista dois elementos sao adjacentes.
 % ------------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ adjacente(Lista, El0, El1) :-
   append(_, [El1,El0|_], Lista).
 
 % ------------------------------------ 2.3 -------------------------------------
-% vizinhas(Ilhas, Ilha, Vz)
+% vizinhas(Ilhas, Ilha, Vzs)
 % vizinhas/3: A um dado conjunto de ilhas extrai aquelas que sao vizinhas da
 % ilha fornecida. Obtem inicialmente todas as ilhas que estao na mesma coluna ou
 % linha que a ilha dada e depois vai buscar as ilhas que teem um caminho livre
@@ -54,7 +54,7 @@ adjacente(Lista, El0, El1) :-
 % para esse efeito.
 % ------------------------------------------------------------------------------
 
-vizinhas(Ilhas, Ilha, Vz) :-
+vizinhas(Ilhas, Ilha, Vzs) :-
   ilha(_, (N_l, N_c)) = Ilha,
   findall(
     Ilha_viz, (member(Ilha_viz, Ilhas),
@@ -64,8 +64,8 @@ vizinhas(Ilhas, Ilha, Vz) :-
     Ilha_viz, (member(Ilha_viz, Ilhas),
     Ilha_viz = ilha(_, (_, N_c))), Col_aux
   ), include(adjacente(Col_aux, Ilha), Col_aux, Col),
-  append(Lin, Col, Vz_aux),
-  sort(2, @=<, Vz_aux, Vz).
+  append(Lin, Col, Vzs_aux),
+  sort(2, @=<, Vzs_aux, Vzs).
 
 % ------------------------------------ 2.4 -------------------------------------
 % estado(Ilhas, Estado)
@@ -77,23 +77,26 @@ vizinhas(Ilhas, Ilha, Vz) :-
 
 estado(Ilhas, Estado) :-
   findall(
-    [X, Y, []], (member(X, Ilhas), vizinhas(Ilhas, X, Y)),
+    [Ilha, Vzs, []], (member(Ilha, Ilhas), vizinhas(Ilhas, Ilha, Vzs)),
     Estado
   ).
 
-% ------------------------------------ Auxiliar --------------------------------
+% ---------------------------------- Auxiliar ----------------------------------
 % entre(Pos1, Pos2, Posicoes)
 % entre/3: Um predicado semelhante ao between, mas que ignora a monotonia dos
 % valores nos primeiros dois argumentos e nao os inclui no resultado final.
 % ------------------------------------------------------------------------------
 
 entre(Pos1, Pos2, Posicoes) :-
-  sort([Pos1, Pos2], [Pos1_novo, Pos2_novo]),
-  Pos1_aux is Pos1_novo + 1, Pos2_aux is Pos2_novo - 1,
-  between(Pos1_aux, Pos2_aux, Posicoes).
+  sort([Pos1, Pos2], [Pos1_aux, Pos2_aux]),
+  Pos1_novo is Pos1_aux + 1, Pos2_novo is Pos2_aux - 1,
+  between(Pos1_novo, Pos2_novo, Posicoes).
 
-% ------------------------------------------------------------------------------
+% ------------------------------------ 2.5 -------------------------------------
 % posicoes_entre(Pos1, Pos2, Posicoes)
+% posicoes_entre/3: Verifica se as duas posicoes que recebe estao na mesma linha
+% ou coluna e depois utiliza o predicado entre/3 para gerar as posicoes entre
+% essas duas posicoes.
 % ------------------------------------------------------------------------------
 
 posicoes_entre((Pos1_X, Pos1_Y), (Pos2_X, Pos2_Y), Posicoes) :-
@@ -104,8 +107,11 @@ posicoes_entre((Pos1_X, Pos1_Y), (Pos2_X, Pos2_Y), Posicoes) :-
     Posicoes
   ), Posicoes \== [].
 
-% ------------------------------------------------------------------------------
+% ------------------------------------ 2.6 -------------------------------------
 % cria_ponte(Pos1, Pos2, Ponte)
+% cria_ponte/3: Organiza as duas posicoes pela ordem do puzzle (esquerda-direita
+% e cima-baixo). Por fim, formata as duas posicoes dentro de uma ponte,
+% retornando-a no fim.
 % ------------------------------------------------------------------------------
 
 cria_ponte(Pos1, Pos2, ponte(Pos1_novo, Pos2_novo)) :-
