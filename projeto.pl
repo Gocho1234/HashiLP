@@ -145,8 +145,7 @@ caminho_livre(Pos1, Pos2, Posicoes, ilha(_, PosI), ilha(_, PosVz)) :-
 
 actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, [I, Vzs, Pontes], [I, Vzs_novo, Pontes]) :-
   findall(
-    Vz, (member(Vz, Vzs),
-    caminho_livre(Pos1, Pos2, Posicoes, I, Vz)),
+    Vz, (member(Vz, Vzs), caminho_livre(Pos1, Pos2, Posicoes, I, Vz)),
     Vzs_aux
   ),
   sort(2, @<, Vzs_aux, Vzs_novo), ! ; Vzs_novo = [].
