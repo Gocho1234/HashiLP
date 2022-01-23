@@ -32,8 +32,10 @@ extrai_ilhas_linha(N_lin, Lin, Ilhas) :-
 
 ilhas(Puz, Ilhas) :-
   findall(
-    Ilha, (nth1(N_lin, Puz, Lin), extrai_ilhas_linha(N_lin, Lin, Ilhas_aux),
-    member(Ilha, Ilhas_aux)), Ilhas
+    Ilha,
+    (nth1(N_lin, Puz, Lin), extrai_ilhas_linha(N_lin, Lin, Ilhas_aux),
+    member(Ilha, Ilhas_aux)),
+    Ilhas
   ).
 
 % ---------------------------------- Auxiliar ----------------------------------
@@ -57,14 +59,20 @@ adjacente(Lista, El0, El1) :-
 
 vizinhas(Ilhas, Ilha, Vzs) :-
   ilha(_, (N_lin, N_col)) = Ilha,
+  % Obtem todas as ilhas na mesma linha que a ilha fornecida.
   findall(
-    Ilha_vz, (member(Ilha_vz, Ilhas),
-    Ilha_vz = ilha(_, (N_lin, _))), Lin_aux
-  ), include(adjacente(Lin_aux, Ilha), Lin_aux, Lin),
+    Ilha_vz,
+    (member(Ilha_vz, Ilhas), Ilha_vz = ilha(_, (N_lin, _))),
+    Lin_aux
+  ),
+  include(adjacente(Lin_aux, Ilha), Lin_aux, Lin),
+  % Obtem todas as ilhas na mesma coluna que a ilha fornecida.
   findall(
-    Ilha_vz, (member(Ilha_vz, Ilhas),
-    Ilha_vz = ilha(_, (_, N_col))), Col_aux
-  ), include(adjacente(Col_aux, Ilha), Col_aux, Col),
+    Ilha_vz,
+    (member(Ilha_vz, Ilhas), Ilha_vz = ilha(_, (_, N_col))),
+    Col_aux
+  ),
+  include(adjacente(Col_aux, Ilha), Col_aux, Col),
   append(Lin, Col, Vzs_aux),
   sort(2, @=<, Vzs_aux, Vzs).
 
@@ -78,7 +86,8 @@ vizinhas(Ilhas, Ilha, Vzs) :-
 
 estado(Ilhas, Estado) :-
   findall(
-    [Ilha, Vzs, []], (member(Ilha, Ilhas), vizinhas(Ilhas, Ilha, Vzs)),
+    [Ilha, Vzs, []],
+    (member(Ilha, Ilhas), vizinhas(Ilhas, Ilha, Vzs)),
     Estado
   ).
 
@@ -106,7 +115,8 @@ posicoes_entre((Pos1_X, Pos1_Y), (Pos2_X, Pos2_Y), Posicoes) :-
     (Pos1_X == Pos2_X, entre(Pos1_Y, Pos2_Y, Y), Pos = (Pos1_X, Y) ;
     Pos1_Y == Pos2_Y, entre(Pos1_X, Pos2_X, X), Pos = (X, Pos2_Y)),
     Posicoes
-  ), Posicoes \== [].
+  ),
+  Posicoes \== [].
 
 % ------------------------------------ 2.6 -------------------------------------
 % cria_ponte(Pos1, Pos2, Ponte)
@@ -131,9 +141,11 @@ cria_ponte(Pos1, Pos2, ponte(Pos1_novo, Pos2_novo)) :-
 caminho_livre(Pos1, Pos2, Posicoes, ilha(_, PosI), ilha(_, PosVz)) :-
   posicoes_entre(PosI, PosVz, PosEntre),
   findall(
-    Pos, (member(Pos, PosEntre), subset([Pos], Posicoes)),
+    Pos,
+    (member(Pos, PosEntre), subset([Pos], Posicoes)),
     Posicoes_comum
-  ), length(Posicoes_comum, Len),
+  ),
+  length(Posicoes_comum, Len),
   (Len \== 1 ; lists:perm([Pos1, Pos2], [PosI, PosVz])).
 
 % ------------------------------------ 2.8 -------------------------------------
@@ -145,7 +157,8 @@ caminho_livre(Pos1, Pos2, Posicoes, ilha(_, PosI), ilha(_, PosVz)) :-
 
 actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, [I, Vzs, Pontes], [I, Vzs_novo, Pontes]) :-
   findall(
-    Vz, (member(Vz, Vzs), caminho_livre(Pos1, Pos2, Posicoes, I, Vz)),
+    Vz,
+    (member(Vz, Vzs), caminho_livre(Pos1, Pos2, Posicoes, I, Vz)),
     Vzs_aux
   ),
   sort(2, @<, Vzs_aux, Vzs_novo), ! ; Vzs_novo = [].
@@ -173,19 +186,26 @@ actualiza_vizinhas_apos_pontes(Estado, Pos1, Pos2, Novo_estado) :-
 
 ilhas_terminadas(Estado, Ilhas_term) :-
   findall(
-    Ilha, (member([Ilha, _, Pontes], Estado), Ilha = ilha(N_Pontes, _),
-    N_Pontes \== 'X', length(Pontes, N_Pontes)), Ilhas_term
+    Ilha,
+    (member([Ilha, _, Pontes], Estado), Ilha = ilha(N_Pontes, _),
+    N_Pontes \== 'X', length(Pontes, N_Pontes)),
+    Ilhas_term
   ).
 
-% ------------------------------------------------------------------------------
+% ------------------------------------ 2.11 ------------------------------------
 % tira_ilhas_terminadas_entrada(Ilhas_term, Entrada, Nova_Entrada)
+% tira_ilhas_terminadas_entrada/3: Retira todas as ilhas terminadas de uma
+% entrada, dando origem a uma nova entrada.
 % ------------------------------------------------------------------------------
 
 tira_ilhas_terminadas_entrada(Ilhas_term, [I, Vzs, Pontes], [I, Vzs_novo, Pontes]) :-
   subtract(Vzs, Ilhas_term, Vzs_novo).
 
-% ------------------------------------------------------------------------------
+% ------------------------------------ 2.12 ------------------------------------
 % tira_ilhas_terminadas(Estado, Ilhas_term, Novo_estado)
+% tira_ilhas_terminadas/3: Remove todas as ilhas terminadas de cada entrada do
+% estado atraves do predicado tira_ilhas_terminadas_entrada, dando origem a um
+% novo estado.
 % ------------------------------------------------------------------------------
 
 tira_ilhas_terminadas(Estado, Ilhas_term, Novo_estado) :-
