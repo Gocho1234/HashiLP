@@ -19,8 +19,9 @@
 
 extrai_ilhas_linha(N_lin, Lin, Ilhas) :-
   findall(
-    ilha(N_Pontes, (N_lin, N_col)), (nth1(N_col, Lin, N_Pontes),
-    N_Pontes \== 0), Ilhas
+    ilha(N_Pontes, (N_lin, N_col)),
+    (nth1(N_col, Lin, N_Pontes), N_Pontes \== 0),
+    Ilhas
   ).
 
 % ------------------------------------ 2.2 -------------------------------------
@@ -142,7 +143,7 @@ caminho_livre(Pos1, Pos2, Posicoes, ilha(_, PosI), ilha(_, PosVz)) :-
   posicoes_entre(PosI, PosVz, PosEntre),
   findall(
     Pos,
-    (member(Pos, PosEntre), subset([Pos], Posicoes)),
+    (member(Pos, PosEntre), member(Pos, Posicoes)),
     Posicoes_comum
   ),
   length(Posicoes_comum, Len),
@@ -214,17 +215,23 @@ tira_ilhas_terminadas(Estado, Ilhas_term, Novo_estado) :-
     Estado, Novo_estado
   ).
 
-% ------------------------------------------------------------------------------
+% ------------------------------------ 2.13 ------------------------------------
 % marca_ilhas_terminadas_entrada(Ilhas_term, Entrada, Nova_Entrada)
+% marca_ilhas_terminadas_entrada/3: Detecta se a ilha de uma dada entrada esta
+% terminada e dah origem a uma nova entrada. Se estiver, substitui o numero de
+% pontes por 'X', caso contrario nao altera a entrada.
 % ------------------------------------------------------------------------------
 
 marca_ilhas_terminadas_entrada(Ilhas_term, [Ilha, Vzs, Pontes], [Nova_Ilha, Vzs, Pontes]) :-
   Ilha = ilha(_, (N_lin, N_col)),
-  (subset([Ilha], Ilhas_term), Nova_Ilha = ilha('X', (N_lin, N_col)) ;
+  (member(Ilha, Ilhas_term), Nova_Ilha = ilha('X', (N_lin, N_col)) ;
   Nova_Ilha = Ilha).
 
-% ------------------------------------------------------------------------------
+% ------------------------------------ 2.14 ------------------------------------
 % marca_ilhas_terminadas(Estado, Ilhas_term, Novo_estado)
+% marca_ilhas_terminadas/3: Marca todas as ilhas de um estado que se encontram
+% terminadas, dando origem a um novo estado. Para esse efeito, recorre ao
+% predicado marca_ilhas_terminadas_entrada/3.
 % ------------------------------------------------------------------------------
 
 marca_ilhas_terminadas(Estado, Ilhas_term, Novo_estado) :-
