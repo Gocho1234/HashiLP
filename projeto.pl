@@ -172,9 +172,9 @@ actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, [I, Vzs, Pontes], [I, Vzs_novo,
 % ------------------------------------------------------------------------------
 
 actualiza_vizinhas_apos_pontes(Estado, Pos1, Pos2, Novo_estado) :-
-  posicoes_entre(Pos1, Pos2, Posicoes),
+  posicoes_entre(Pos1, Pos2, PosEntre),
   maplist(
-    actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes),
+    actualiza_vizinhas_entrada(Pos1, Pos2, PosEntre),
     Estado, Novo_estado
   ).
 
@@ -240,8 +240,11 @@ marca_ilhas_terminadas(Estado, Ilhas_term, Novo_estado) :-
     Estado, Novo_estado
   ).
 
-% ------------------------------------------------------------------------------
+% ------------------------------------ 2.15 ------------------------------------
 % trata_ilhas_terminadas(Estado, Novo_estado)
+% trata_ilhas_terminadas/2: Retira todas as ilhas terminadas das entradas no
+% estado e depois marca todos as entradas com essas ilhas. Deste modo, recorre
+% aos predicados tira_ilhas_terminadas/3 e marca_ilhas_terminadas/3.
 % ------------------------------------------------------------------------------
 
 trata_ilhas_terminadas(Estado, Novo_estado) :-
@@ -249,9 +252,9 @@ trata_ilhas_terminadas(Estado, Novo_estado) :-
   tira_ilhas_terminadas(Estado, Ilhas_term, Estado_aux),
   marca_ilhas_terminadas(Estado_aux, Ilhas_term, Novo_estado).
 
-% ------------------------------------------------------------------------------
+% ---------------------------------- Auxiliar ----------------------------------
 % adiciona_pontes(N_Pontes, Ilha1, Ilha2, Entrada, Nova_Entrada)
-% Predicado auxiliar
+% adiciona_pontes/5:
 % ------------------------------------------------------------------------------
 
 adiciona_pontes(N_Pontes, Ilha1, Ilha2, Entrada, Nova_Entrada) :-
@@ -265,8 +268,9 @@ adiciona_pontes(N_Pontes, Ilha1, Ilha2, Entrada, Nova_Entrada) :-
   Pontes = Pontes_antigas),
   Nova_Entrada = [Ilha, Vzs, Pontes].
 
-% ------------------------------------------------------------------------------
+% ------------------------------------ 2.16 ------------------------------------
 % junta_pontes(Estado, N_Pontes, Ilha1, Ilha2, Novo_estado)
+% junta_pontes/5:
 % ------------------------------------------------------------------------------
 
 junta_pontes(Estado, N_Pontes, Ilha1, Ilha2, Novo_estado) :-
