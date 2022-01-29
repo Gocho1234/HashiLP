@@ -254,20 +254,31 @@ trata_ilhas_terminadas(Estado, Novo_estado) :-
   marca_ilhas_terminadas(Estado_aux, Ilhas_term, Novo_estado).
 
 % ---------------------------------- Auxiliar ----------------------------------
-% adiciona_pontes(N_Pontes, Ilha1, Ilha2, Entrada, Nova_Entrada)
-% adiciona_pontes/5:
+% repete_el(El, N, Lista_rep)
+% repete_el/3: Este predicado cria uma lista constituida por N ocorrencias do
+% elemento El.
 % ------------------------------------------------------------------------------
 
-adiciona_pontes(N_Pontes, Ilha1, Ilha2, Entrada, Nova_Entrada) :-
+repete_el(El, 1, [El]) :- !.
+repete_el(El, N, [El|R]) :-
+  N > 1,
+  N_1 is N - 1,
+  repete_el(El, N_1, R).
+
+% ---------------------------------- Auxiliar ----------------------------------
+% adiciona_pontes(N_Pontes, Ilha1, Ilha2, Entrada, Nova_Entrada)
+% adiciona_pontes/5: Adiciona as pontes necessarias ah entrada correspondente a
+% essa nova ponte. Utiliza o predicado repete_el/3 para repetir as pontes N
+% vezes.
+% ------------------------------------------------------------------------------
+
+adiciona_pontes(N_Pontes, Ilha1, Ilha2, [Ilha, Vzs, Pontes_antigas], [Ilha, Vzs, Pontes]) :-
+  member(Ilha, [Ilha1, Ilha2]),
   Ilha1 = ilha(_, Pos1), Ilha2 = ilha(_, Pos2),
-  Entrada = [Ilha, Vzs, Pontes_antigas],
   cria_ponte(Pos1, Pos2, Ponte_aux),
-  (N_Pontes == 1, Ponte = [Ponte_aux] ;
-  N_Pontes == 2, append([Ponte_aux], [Ponte_aux], Ponte)),
-  (Ilha == Ilha1, append(Pontes_antigas, Ponte, Pontes) ;
-  Ilha == Ilha2, append(Pontes_antigas, Ponte, Pontes) ;
-  Pontes = Pontes_antigas),
-  Nova_Entrada = [Ilha, Vzs, Pontes].
+  repete_el(Ponte_aux, N_Pontes, Pontes_aux),
+  append(Pontes_antigas, Pontes_aux, Pontes) ;
+  Pontes = Pontes_antigas.
 
 % ------------------------------------ 2.16 ------------------------------------
 % junta_pontes(Estado, N_Pontes, Ilha1, Ilha2, Novo_estado)
@@ -283,6 +294,6 @@ junta_pontes(Estado, N_Pontes, Ilha1, Ilha2, Novo_estado) :-
   maplist(
     adiciona_pontes(N_Pontes, Ilha1, Ilha2),
     Estado, Estado_aux
-  ), !,
+  ),
   actualiza_vizinhas_apos_pontes(Estado_aux, Pos1, Pos2, Novo_estado_aux),
   trata_ilhas_terminadas(Novo_estado_aux, Novo_estado).
