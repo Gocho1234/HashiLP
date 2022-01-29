@@ -40,14 +40,15 @@ ilhas(Puz, Ilhas) :-
   ).
 
 % ---------------------------------- Auxiliar ----------------------------------
-% adjacente(Lista, El0, El1)
-% adjacente/3: Verifica se numa dada lista dois elementos (El0 e El1) sao
-% adjacentes.
+% adjacente(Lista, El1, El2)
+% adjacente/3: Verifica se numa dada lista dois elementos (El1 e El2) sao
+% adjacentes. Para este efeito verificamos se os elementos aparecem juntos na
+% lista fornecida atraves do append/3.
 % ------------------------------------------------------------------------------
 
-adjacente(Lista, El0, El1) :-
-  append(_, [El0,El1|_], Lista) ;
-  append(_, [El1,El0|_], Lista).
+adjacente(Lista, El1, El2) :-
+  append(_, [El1,El2|_], Lista) ;
+  append(_, [El2,El1|_], Lista).
 
 % ------------------------------------ 2.3 -------------------------------------
 % vizinhas(Ilhas, Ilha, Vzs)
@@ -60,14 +61,14 @@ adjacente(Lista, El0, El1) :-
 
 vizinhas(Ilhas, Ilha, Vzs) :-
   ilha(_, (N_lin, N_col)) = Ilha,
-  % Obtem todas as ilhas na mesma linha que a ilha fornecida.
+  % Obtem todas as ilhas vizinhas na mesma linha que a ilha fornecida.
   findall(
     Ilha_vz,
     (member(Ilha_vz, Ilhas), Ilha_vz = ilha(_, (N_lin, _))),
     Lin_aux
   ),
   include(adjacente(Lin_aux, Ilha), Lin_aux, Lin),
-  % Obtem todas as ilhas na mesma coluna que a ilha fornecida.
+  % Obtem todas as ilhas vizinhas na mesma coluna que a ilha fornecida.
   findall(
     Ilha_vz,
     (member(Ilha_vz, Ilhas), Ilha_vz = ilha(_, (_, N_col))),
@@ -81,8 +82,8 @@ vizinhas(Ilhas, Ilha, Vzs) :-
 % estado(Ilhas, Estado)
 % estado/2: Obtem o estado de todas as ilhas de um dado puzzle, ou seja, vai
 % buscar todas as ilhas vizinhas a essa ilha e guarda-as junto da ilha
-% fornecida numa entrada. Por fim, o terceiro elemento da entrada inicia sempre
-% com uma lista vazia.
+% fornecida numa entrada (lista com 3 elementos). Por fim, o terceiro elemento
+% da entrada inicia sempre com uma lista vazia.
 % ------------------------------------------------------------------------------
 
 estado(Ilhas, Estado) :-
@@ -93,15 +94,15 @@ estado(Ilhas, Estado) :-
   ).
 
 % ---------------------------------- Auxiliar ----------------------------------
-% entre(Pos1, Pos2, Posicoes)
+% entre(Val1, Val2, ValEntre)
 % entre/3: Um predicado semelhante ao between, mas que ignora a monotonia entre
 % os valores nos primeiros dois argumentos e nao os inclui no resultado final.
 % ------------------------------------------------------------------------------
 
-entre(Pos1, Pos2, Posicoes) :-
-  sort([Pos1, Pos2], [Pos1_aux, Pos2_aux]),
-  Pos1_novo is Pos1_aux + 1, Pos2_novo is Pos2_aux - 1,
-  between(Pos1_novo, Pos2_novo, Posicoes).
+entre(Val1, Val2, ValEntre) :-
+  sort([Val1, Val2], [Val1_aux, Val2_aux]),
+  Val1_novo is Val1_aux + 1, Val2_novo is Val2_aux - 1,
+  between(Val1_novo, Val2_novo, ValEntre).
 
 % ------------------------------------ 2.5 -------------------------------------
 % posicoes_entre(Pos1, Pos2, Posicoes)
@@ -123,7 +124,7 @@ posicoes_entre((Pos1_X, Pos1_Y), (Pos2_X, Pos2_Y), Posicoes) :-
 % cria_ponte(Pos1, Pos2, Ponte)
 % cria_ponte/3: Organiza as duas posicoes pela ordem do puzzle (esquerda-direita
 % e cima-baixo). Por fim, formata as duas posicoes dentro de uma ponte,
-% retornando-a no fim.
+% retornando-a no final.
 % ------------------------------------------------------------------------------
 
 cria_ponte(Pos1, Pos2, ponte(Pos1_novo, Pos2_novo)) :-
@@ -133,7 +134,7 @@ cria_ponte(Pos1, Pos2, ponte(Pos1_novo, Pos2_novo)) :-
 % caminho_livre(Pos1, Pos2, Posicoes, I, Vz)
 % caminho_livre/5: Verifica se a ilha Vz continua a ser vizinha da ilha I apos
 % a adicao de uma ponte entre as ilhas nas posicoes Pos1 e Pos2. Para este
-% efeito, obtem as posicoes em comum entre Posicoes e as posicoes entre as
+% efeito, obtem as posicoes partilhadas entre Posicoes e as posicoes entre as
 % ilhas I e Vz. Se apenas houver uma posicao em comum entao nao ha caminho livre
 % desde que as ilhas I e Vz sejam diferentes das ilhas nas Pos1 e Pos2. Caso
 % haja mais que uma ou nenhuma posicao em comum entao ha sempre caminho livre.
@@ -147,7 +148,7 @@ caminho_livre(Pos1, Pos2, Posicoes, ilha(_, PosI), ilha(_, PosVz)) :-
     Posicoes_comum
   ),
   length(Posicoes_comum, Len),
-  (Len \== 1 ; lists:perm([Pos1, Pos2], [PosI, PosVz])).
+  Len \== 1 ; lists:perm([Pos1, Pos2], [PosI, PosVz]).
 
 % ------------------------------------ 2.8 -------------------------------------
 % actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, Entrada, Nova_Entrada)
@@ -162,7 +163,7 @@ actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, [I, Vzs, Pontes], [I, Vzs_novo,
     (member(Vz, Vzs), caminho_livre(Pos1, Pos2, Posicoes, I, Vz)),
     Vzs_aux
   ),
-  sort(2, @<, Vzs_aux, Vzs_novo), ! ; Vzs_novo = [].
+  sort(2, @<, Vzs_aux, Vzs_novo).
 
 % ------------------------------------ 2.9 -------------------------------------
 % actualiza_vizinhas_apos_pontes(Estado, Pos1, Pos2, Novo_estado)
@@ -181,8 +182,8 @@ actualiza_vizinhas_apos_pontes(Estado, Pos1, Pos2, Novo_estado) :-
 % ------------------------------------ 2.10 ------------------------------------
 % ilhas_terminadas(Estado, Ilhas_term)
 % ilhas_terminadas/2: Percorre todas as entradas de um determinado estado e
-% extrai todas as ilhas que estao terminadas. Assim, verifica todas as entradas
-% que teem um numero de pontes adequado e depois guarda as corretas.
+% extrai todas as ilhas que estao terminadas. Assim, guarda todas as entradas
+% que teem um numero de pontes adequado e diferente de 'X'.
 % ------------------------------------------------------------------------------
 
 ilhas_terminadas(Estado, Ilhas_term) :-
@@ -205,7 +206,7 @@ tira_ilhas_terminadas_entrada(Ilhas_term, [I, Vzs, Pontes], [I, Vzs_novo, Pontes
 % ------------------------------------ 2.12 ------------------------------------
 % tira_ilhas_terminadas(Estado, Ilhas_term, Novo_estado)
 % tira_ilhas_terminadas/3: Remove todas as ilhas terminadas de cada entrada do
-% estado atraves do predicado tira_ilhas_terminadas_entrada, dando origem a um
+% estado atraves do predicado tira_ilhas_terminadas_entrada/3, dando origem a um
 % novo estado.
 % ------------------------------------------------------------------------------
 
@@ -224,8 +225,8 @@ tira_ilhas_terminadas(Estado, Ilhas_term, Novo_estado) :-
 
 marca_ilhas_terminadas_entrada(Ilhas_term, [Ilha, Vzs, Pontes], [Nova_Ilha, Vzs, Pontes]) :-
   Ilha = ilha(_, (N_lin, N_col)),
-  (member(Ilha, Ilhas_term), Nova_Ilha = ilha('X', (N_lin, N_col)) ;
-  Nova_Ilha = Ilha).
+  member(Ilha, Ilhas_term), Nova_Ilha = ilha('X', (N_lin, N_col)) ;
+  Nova_Ilha = Ilha.
 
 % ------------------------------------ 2.14 ------------------------------------
 % marca_ilhas_terminadas(Estado, Ilhas_term, Novo_estado)
@@ -270,7 +271,11 @@ adiciona_pontes(N_Pontes, Ilha1, Ilha2, Entrada, Nova_Entrada) :-
 
 % ------------------------------------ 2.16 ------------------------------------
 % junta_pontes(Estado, N_Pontes, Ilha1, Ilha2, Novo_estado)
-% junta_pontes/5:
+% junta_pontes/5: Este predicado cria a(s) ponte(s) entre as Ilhas fornecidas
+% (Ilha1 e Ilha2), depois adiciona as novas pontes as ilhas correspondentes no
+% estado um numero de vezes igual a N_Pontes. Por fim, atualiza todas as
+% entradas do estado por meio dos predicados actualiza_vizinhas_apos_pontes/4 e
+% trata_ilhas_terminadas/2.
 % ------------------------------------------------------------------------------
 
 junta_pontes(Estado, N_Pontes, Ilha1, Ilha2, Novo_estado) :-
