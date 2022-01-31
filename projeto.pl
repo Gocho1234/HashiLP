@@ -53,10 +53,10 @@ adjacente(Lista, El1, El2) :-
 % ------------------------------------ 2.3 -------------------------------------
 % vizinhas(Ilhas, Ilha, Vzs)
 % vizinhas/3: A um dado conjunto de ilhas extrai aquelas que sao vizinhas da
-% ilha fornecida. Obtem inicialmente todas as ilhas que estao na mesma coluna ou
-% linha que a ilha dada e depois vai buscar as ilhas que teem um caminho livre
-% entre elas e a ilha fornecida, utilizando um predicado auxiliar adjacente/3
-% para esse efeito.
+% ilha fornecida. Obtem inicialmente todas as ilhas que estao na mesma coluna
+% ou linha que a ilha dada e depois vai buscar as ilhas que teem um caminho sem
+% obstaculos entre elas e a ilha fornecida, utilizando um predicado auxiliar
+% adjacente/3 para esse efeito.
 % ------------------------------------------------------------------------------
 
 vizinhas(Ilhas, Ilha, Vzs) :-
@@ -81,9 +81,9 @@ vizinhas(Ilhas, Ilha, Vzs) :-
 % ------------------------------------ 2.4 -------------------------------------
 % estado(Ilhas, Estado)
 % estado/2: Obtem o estado de todas as ilhas de um dado puzzle, ou seja, vai
-% buscar todas as ilhas vizinhas a essa ilha e guarda-as junto da ilha
-% fornecida numa entrada (lista com 3 elementos). Por fim, o terceiro elemento
-% da entrada inicia sempre com uma lista vazia.
+% buscar todas as ilhas vizinhas a essa ilha e guarda-as junto da ilha fornecida
+% numa entrada (lista com 3 elementos). Por fim, o terceiro elemento da entrada
+% inicia sempre com uma lista vazia.
 % ------------------------------------------------------------------------------
 
 estado(Ilhas, Estado) :-
@@ -122,9 +122,9 @@ posicoes_entre((Pos1_X, Pos1_Y), (Pos2_X, Pos2_Y), Posicoes) :-
 
 % ------------------------------------ 2.6 -------------------------------------
 % cria_ponte(Pos1, Pos2, Ponte)
-% cria_ponte/3: Organiza as duas posicoes pela ordem do puzzle (esquerda-direita
-% e cima-baixo). Por fim, formata as duas posicoes dentro de uma ponte,
-% retornando-a no final.
+% cria_ponte/3: Organiza as duas posicoes pela ordem do puzzle (da esquerda para
+% a direita e de cima para baixo). Por fim, formata as duas posicoes dentro de
+% uma ponte, retornando-a no final.
 % ------------------------------------------------------------------------------
 
 cria_ponte(Pos1, Pos2, ponte(Pos1_novo, Pos2_novo)) :-
@@ -141,6 +141,7 @@ cria_ponte(Pos1, Pos2, ponte(Pos1_novo, Pos2_novo)) :-
 % ------------------------------------------------------------------------------
 
 caminho_livre(Pos1, Pos2, Posicoes, ilha(_, PosI), ilha(_, PosVz)) :-
+  permutation([Pos1, Pos2], [PosI, PosVz]), ! ;
   posicoes_entre(PosI, PosVz, PosEntre),
   findall(
     Pos,
@@ -148,13 +149,14 @@ caminho_livre(Pos1, Pos2, Posicoes, ilha(_, PosI), ilha(_, PosVz)) :-
     Posicoes_comum
   ),
   length(Posicoes_comum, Len),
-  Len \== 1 ; lists:perm([Pos1, Pos2], [PosI, PosVz]).
+  Len \== 1.
 
 % ------------------------------------ 2.8 -------------------------------------
 % actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, Entrada, Nova_Entrada)
 % actualiza_vizinhas_entrada/5: Apos a adicao de uma ponte entre as ilhas nas
-% posicoes Pos1 e Pos2 este predicado atualiza uma entrada, ou seja, remove
-% todas as ilhas que deixaram de ser vizinhas devido a essa nova ponte.
+% posicoes Pos1 e Pos2 este predicado atualiza uma entrada, ou seja, na lista de
+% ilhas vizinhas de cada entrada sao removidas todas as ilhas que deixaram de
+% ser vizinhas devido ah adicao dessa nova ponte.
 % ------------------------------------------------------------------------------
 
 actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, [I, Vzs, Pontes], [I, Vzs_novo, Pontes]) :-
@@ -182,8 +184,8 @@ actualiza_vizinhas_apos_pontes(Estado, Pos1, Pos2, Novo_estado) :-
 % ------------------------------------ 2.10 ------------------------------------
 % ilhas_terminadas(Estado, Ilhas_term)
 % ilhas_terminadas/2: Percorre todas as entradas de um determinado estado e
-% extrai todas as ilhas que estao terminadas. Assim, guarda todas as entradas
-% que teem um numero de pontes adequado e diferente de 'X'.
+% extrai todas as ilhas que estao terminadas, ou seja, guarda todas as entradas
+% que teem um numero de pontes igual a N_Pontes e diferente de 'X'.
 % ------------------------------------------------------------------------------
 
 ilhas_terminadas(Estado, Ilhas_term) :-
@@ -218,14 +220,14 @@ tira_ilhas_terminadas(Estado, Ilhas_term, Novo_estado) :-
 
 % ------------------------------------ 2.13 ------------------------------------
 % marca_ilhas_terminadas_entrada(Ilhas_term, Entrada, Nova_Entrada)
-% marca_ilhas_terminadas_entrada/3: Detecta se a ilha de uma dada entrada esta
-% terminada e dah origem a uma nova entrada. Se estiver, substitui o numero de
-% pontes por 'X', caso contrario nao altera a entrada.
+% marca_ilhas_terminadas_entrada/3: Detecta se a ilha de uma dada entrada estah
+% terminada e dah origem a uma nova entrada. Se estiver terminada substitui o
+% numero de pontes por 'X', caso contrario nao altera a entrada.
 % ------------------------------------------------------------------------------
 
 marca_ilhas_terminadas_entrada(Ilhas_term, [Ilha, Vzs, Pontes], [Nova_Ilha, Vzs, Pontes]) :-
-  Ilha = ilha(_, (N_lin, N_col)),
-  member(Ilha, Ilhas_term), Nova_Ilha = ilha('X', (N_lin, N_col)) ;
+  member(Ilha, Ilhas_term),
+  Ilha = ilha(_, (N_lin, N_col)), Nova_Ilha = ilha('X', (N_lin, N_col)) ;
   Nova_Ilha = Ilha.
 
 % ------------------------------------ 2.14 ------------------------------------
