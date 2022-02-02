@@ -123,8 +123,7 @@ posicoes_entre((Pos1_X, Pos1_Y), (Pos2_X, Pos2_Y), Posicoes) :-
 % ------------------------------------ 2.6 -------------------------------------
 % cria_ponte(Pos1, Pos2, Ponte)
 % cria_ponte/3: Organiza as duas posicoes pela ordem do puzzle (da esquerda para
-% a direita e de cima para baixo). Por fim, formata as duas posicoes dentro de
-% uma ponte, retornando-a no final.
+% a direita e de cima para baixo) e depois cria a ponte pedida.
 % ------------------------------------------------------------------------------
 
 cria_ponte(Pos1, Pos2, ponte(Pos1_novo, Pos2_novo)) :-
@@ -134,10 +133,11 @@ cria_ponte(Pos1, Pos2, ponte(Pos1_novo, Pos2_novo)) :-
 % caminho_livre(Pos1, Pos2, Posicoes, I, Vz)
 % caminho_livre/5: Verifica se a ilha Vz continua a ser vizinha da ilha I apos
 % a adicao de uma ponte entre as ilhas nas posicoes Pos1 e Pos2. Para este
-% efeito, obtem as posicoes partilhadas entre Posicoes e as posicoes entre as
-% ilhas I e Vz. Se apenas houver uma posicao em comum entao nao ha caminho livre
-% desde que as ilhas I e Vz sejam diferentes das ilhas nas Pos1 e Pos2. Caso
-% haja mais que uma ou nenhuma posicao em comum entao ha sempre caminho livre.
+% efeito, obtem as posicoes entre as ilhas I e Vz e extrai aquelas que estao em
+% comum com a lista Posicoes. Se apenas houver uma posicao em comum entao nao ha
+% caminho livre desde que as ilhas I e Vz sejam diferentes das ilhas nas Pos1 e
+% Pos2. Caso haja mais que uma ou nenhuma posicao em comum entao ha sempre
+% caminho livre.
 % ------------------------------------------------------------------------------
 
 caminho_livre(Pos1, Pos2, Posicoes, ilha(_, PosI), ilha(_, PosVz)) :-
@@ -148,15 +148,13 @@ caminho_livre(Pos1, Pos2, Posicoes, ilha(_, PosI), ilha(_, PosVz)) :-
     (member(Pos, PosEntre), member(Pos, Posicoes)),
     Posicoes_comum
   ),
-  length(Posicoes_comum, Len),
-  Len \== 1.
+  \+ length(Posicoes_comum, 1).
 
 % ------------------------------------ 2.8 -------------------------------------
 % actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, Entrada, Nova_Entrada)
 % actualiza_vizinhas_entrada/5: Apos a adicao de uma ponte entre as ilhas nas
-% posicoes Pos1 e Pos2 este predicado atualiza uma entrada, ou seja, na lista de
-% ilhas vizinhas de cada entrada sao removidas todas as ilhas que deixaram de
-% ser vizinhas devido ah adicao dessa nova ponte.
+% posicoes Pos1 e Pos2, este predicado remove da lista de ilhas vizinhas de cada
+% entrada todas as ilhas que deixaram de ser vizinhas.
 % ------------------------------------------------------------------------------
 
 actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, [I, Vzs, Pontes], [I, Vzs_novo, Pontes]) :-
