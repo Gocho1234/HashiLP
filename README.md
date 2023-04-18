@@ -1,5 +1,5 @@
-__Hashi Solver (Project LP)__
-___
+# Hashi Solver (Project LP)
+
 This project consisted in writing a prolog program to solve simple [hashi puzzles](https://en.wikipedia.org/wiki/Hashiwokakero).
 
-[Project Statement](docs/projectoLP_21_22.pdf) | [Project Presentation](docs/Apr._Visual_Projeto_LP.pdf)
+[Project Statement](docs/statement.pdf) | [Project Presentation](docs/visual_presentation.pdf)
